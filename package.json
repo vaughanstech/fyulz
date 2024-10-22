@@ -4,6 +4,9 @@
   "description": "Application to convert image and video, and audio formats",
   "main": "dist/index.js",
   "scripts": {
+    "start": "ts-node src/index.ts",
+    "build": "tsc",
+    "electron": "tsc && electron .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
