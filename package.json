@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "electron": "^33.0.2",
-    "puppeteer": "^23.6.0"
+    "puppeteer": "^23.6.0",
+    "sharp": "^0.33.5"
   }
 }

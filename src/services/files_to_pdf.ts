@@ -1,32 +1,55 @@
 import * as ppt from "puppeteer";
 import * as fs from "fs";
 import * as path from "path";
+import * as sharp from "sharp";
 
-async function convertToPDF(imgPath: string, outputPath: string) {
+async function convertImageFiles(
+  imgPath: string,
+  outputPath: string,
+  fileType: string
+) {
   const browser = await ppt.launch({
     args: ["--allow-file-access-from-files", "--enable-local-file-accesses"],
   });
   const page = await browser.newPage();
   const file_ext = path.extname(imgPath);
 
-  let bitmap = fs.readFileSync(imgPath);
-  let base64Encode = Buffer.from(bitmap).toString("base64");
-
   console.log(`Converting file: ${imgPath}\n`);
   if (fs.existsSync(imgPath)) {
-    console.log(`Converting ${file_ext} to pdf`);
+    console.log(`File ${imgPath} exists, converting`);
   } else {
-    throw new Error("File does not exist");
+    throw new Error(`File: ${imgPath} does not exist`);
   }
 
-  // Load the image into the page
-  const image = "data:image/png;base64," + base64Encode;
-  await page.goto(image, { waitUntil: "networkidle2" });
+  try {
+    switch (fileType) {
+      case "pdf": {
+        console.log("Converting file to pdf");
+        // Load the image into the page
+        const bitmap = fs.readFileSync(imgPath);
+        const base64Encode = Buffer.from(bitmap).toString("base64");
+        const image = "data:image/png;base64," + base64Encode;
+        await page.goto(image, { waitUntil: "networkidle2" });
 
-  // Generate the PDF
-  await page.pdf({ path: outputPath, format: "A4" });
-
-  await browser.close();
+        // Generate the PDF
+        await page.pdf({ path: outputPath, format: "A4" });
+        await browser.close();
+        break;
+      }
+      case "png":
+      case "svg":
+      case "webp": {
+        console.log(`Converting file to ${file_ext}`);
+        // Take a screenshot and save it as PNG
+        sharp(imgPath).toFile(outputPath);
+        await browser.close();
+        break;
+      }
+    }
+  } catch {
+    await browser.close();
+    throw new Error(`File: ${imgPath} could not be converted`);
+  }
 }
 
-convertToPDF("my_pic.jpg", "my_pic.pdf");
+convertImageFiles("my_pic.jpg", "my_pic.svg", "svg");
