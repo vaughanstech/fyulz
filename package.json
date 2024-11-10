@@ -6,7 +6,8 @@
   "scripts": {
     "start": "ts-node src/index.ts",
     "build": "tsc",
-    "electron": "tsc && electron .",
+    "electron": "tsc && ELECTRON_DISABLE_SECURITY_WARNINGS=true electron .",
+    "app:dev": "npm run build && npm run electron",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
